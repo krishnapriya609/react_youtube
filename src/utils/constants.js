@@ -11,4 +11,4 @@ export const categories = [
   { name: "Podcast" }
 ];
 
-export const API_KEY = "AIzaSyDs7__osIfFWEuCOmtNSnOCMJXd8WnOEGw";
+export const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
