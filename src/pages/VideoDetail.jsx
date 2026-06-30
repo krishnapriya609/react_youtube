@@ -1,68 +1,50 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ReactPlayer from "react-player";
-import Navbar from "../components/Navbar";
-import Videos from "../components/Videos";
 import { fetchFromAPI } from "../utils/fetchFromAPI";
 
 function VideoDetail() {
   const { id } = useParams();
 
-  const [videoDetail, setVideoDetail] = useState(null);
-  const [relatedVideos, setRelatedVideos] = useState([]);
+  const [video, setVideo] = useState(null);
 
   useEffect(() => {
-    fetchFromAPI(
-      `videos?part=snippet,statistics&id=${id}`
-    ).then((data) => setVideoDetail(data.items[0]));
-
-    fetchFromAPI(
-      `search?part=snippet&relatedToVideoId=${id}&type=video`
-    ).then((data) => setRelatedVideos(data.items));
+    fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
+      .then((data) => setVideo(data.items[0]))
+      .catch((err) => console.error(err));
   }, [id]);
 
-  if (!videoDetail) return "Loading...";
+  if (!video) return <h2 style={{ color: "white" }}>Loading...</h2>;
 
   return (
-    <>
-      <Navbar />
+    <div
+      style={{
+        background: "#0f0f0f",
+        minHeight: "100vh",
+        color: "white",
+        padding: "20px",
+      }}
+    >
+    <iframe
+  width="100%"
+  height="600"
+  src={`https://www.youtube.com/embed/${id}?autoplay=1`}
+  title="YouTube video player"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
 
-      <div className="video-detail-container">
-        <div className="video-player-section">
-          <ReactPlayer
-            url={`https://www.youtube.com/watch?v=${id}`}
-            controls
-            width="100%"
-          />
+      <h2 style={{ marginTop: "20px" }}>
+        {video.snippet.title}
+      </h2>
 
-          <h2 className="video-title">
-            {videoDetail.snippet.title}
-          </h2>
+      <p>{video.snippet.channelTitle}</p>
 
-          <p className="channel-name">
-            {videoDetail.snippet.channelTitle}
-          </p>
-
-          <div className="stats">
-            <span>
-              👁 {Number(
-                videoDetail.statistics.viewCount
-              ).toLocaleString()} views
-            </span>
-
-            <span>
-              👍 {Number(
-                videoDetail.statistics.likeCount
-              ).toLocaleString()} likes
-            </span>
-          </div>
-        </div>
-
-        <div className="related-videos">
-          <Videos videos={relatedVideos} />
-        </div>
-      </div>
-    </>
+      <p>
+        👁 {Number(video.statistics.viewCount).toLocaleString()} views
+      </p>
+    </div>
   );
 }
 
